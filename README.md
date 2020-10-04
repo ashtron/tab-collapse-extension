@@ -1,0 +1,1 @@
+# tab-collapse-extension
