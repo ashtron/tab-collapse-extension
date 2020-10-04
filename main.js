@@ -42,6 +42,7 @@ window.onload = function() {
 
             buildUrlList();
         });
+        
     }
 
     function buildUrlList() {
