@@ -5,6 +5,13 @@ window.onload = function() {
         setURLs();
     });
 
+    const clearBtn = document.getElementById("clear-btn");
+    clearBtn.addEventListener("click", () => {
+        chrome.storage.sync.set({ tabs: [] });
+        const urlList = document.getElementById("urls");
+        urlList.innerHTML = "";
+    });
+
     buildUrlList();
 
     // function updateURLs() {
