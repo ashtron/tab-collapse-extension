@@ -1,25 +1,47 @@
 window.onload = function() {
-    // const btn = document.getElementById("btn-test");
-    // btn.addEventListener("click", () => {
-    //     alert("hello!");
-    // });
 
-    getURLs();
+    const collapseBtn = document.getElementById("collapse-btn");
+    collapseBtn.addEventListener("click", () => {
+        setURLs();
+        buildUrlList();
+    });
 
-    function getURLs() {
-        // Get the URLs for the current window's tabs.
+    // function updateURLs() {
+    //     chrome.storage.sync.get(["urls"], (res) => {
+    //         setURLs(res.urls);
+    //     });
+
+    // }
+
+    function setURLs(currentURLs) {
+
+        // Get the URLs of the current window's tabs.
         chrome.tabs.query({}, tabs => {
-            let _urls = [];
+            alert(tabs[0].title)
+            let newURLs = [];
         
             tabs.forEach(tab => {
-                _urls.push(tab.url);
+                newURLs.push(tab.url);
             });
 
             // Remove duplicates.
-            _urls = [...new Set(_urls)];
+            newURLs = [...new Set(newURLs)];
         
             // Save to storage.
-            chrome.storage.sync.set({ urls: _urls });
+            chrome.storage.sync.set({ urls: newURLs });
+        });
+
+    }
+
+    function buildUrlList() {
+        chrome.storage.sync.get(["urls"], (result) => {
+            const urlList = document.getElementById("urls");
+
+            result.urls.forEach((url) => {
+                const li = document.createElement("li");
+                li.innerHTML = url;
+                urlList.append(li);
+            });
         });
     }
 }
