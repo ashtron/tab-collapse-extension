@@ -3,8 +3,9 @@ window.onload = function() {
     const collapseBtn = document.getElementById("collapse-btn");
     collapseBtn.addEventListener("click", () => {
         setURLs();
-        buildUrlList();
     });
+
+    buildUrlList();
 
     // function updateURLs() {
     //     chrome.storage.sync.get(["urls"], (res) => {
@@ -17,29 +18,32 @@ window.onload = function() {
 
         // Get the URLs of the current window's tabs.
         chrome.tabs.query({}, tabs => {
-            alert(tabs[0].title)
-            let newURLs = [];
+            let _tabs = [];
         
             tabs.forEach(tab => {
-                newURLs.push(tab.url);
+                _tabs.push({
+                    title: tab.title,
+                    url: tab.url
+                });
             });
 
             // Remove duplicates.
-            newURLs = [...new Set(newURLs)];
+            _tabs = [...new Set(_tabs)];
         
             // Save to storage.
-            chrome.storage.sync.set({ urls: newURLs });
-        });
+            chrome.storage.sync.set({ tabs: _tabs });
 
+            buildUrlList();
+        });
     }
 
     function buildUrlList() {
-        chrome.storage.sync.get(["urls"], (result) => {
+        chrome.storage.sync.get(["tabs"], (result) => {
             const urlList = document.getElementById("urls");
 
-            result.urls.forEach((url) => {
+            result.tabs.forEach((tab) => {
                 const li = document.createElement("li");
-                li.innerHTML = url;
+                li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`
                 urlList.append(li);
             });
         });
