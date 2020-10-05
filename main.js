@@ -1,31 +1,28 @@
 window.onload = function() {
-    chrome.storage.sync.get(["isOpen"], (result) => {
-        if (!result.isOpen)
-            chrome.tabs.create({ url: "popup.html" }, setOpenStatus);
-    });
+    init();
 
-    const collapseBtn = document.getElementById("collapse-btn");
-    const clearBtn = document.getElementById("clear-btn");
+    function init() {
+        const saveButton = document.getElementById("save-btn");
+        const clearBtn = document.getElementById("clear-btn");
+        
+        saveButton.addEventListener("click", () => {        
+            update();
+        });
     
-    collapseBtn.addEventListener("click", () => {        
-        setURLs();
-    });
-
-    clearBtn.addEventListener("click", () => {
-        chrome.storage.sync.set({ tabs: [] });
-        const urlList = document.getElementById("urls");
-        urlList.innerHTML = "";
-    });
-
-    function setOpenStatus() {
-        chrome.storage.sync.set({ isOpen: true });
-        setURLs();
+        clearBtn.addEventListener("click", () => {
+            // Reset list of saved URLs.
+            chrome.storage.sync.set({ tabs: [] });
+    
+            // Clear DOM.
+            const urlList = document.getElementById("urls");
+            urlList.innerHTML = "";
+        });
     }
 
-    function setURLs() {
+    function update() {
         chrome.storage.sync.get(["tabs"], (result) => {
 
-            // Get the URLs of all open tabs.
+            // Concatenate saved tabs with open tabs.
             chrome.tabs.query({}, tabs => {
                 let _tabs = result.tabs;
             
@@ -41,9 +38,7 @@ window.onload = function() {
 
                 // Remove duplicates.
                 _tabs = [...new Set(_tabs)];
-                console.log(_tabs);
             
-                // Save to storage.
                 chrome.storage.sync.set({ tabs: _tabs }, buildUrlList);
             });
         });        
@@ -54,23 +49,23 @@ window.onload = function() {
             const urlList = document.getElementById("urls");
             urlList.innerHTML = "";
 
-            const saverUrl = "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html";
+            // Add a new li for each saved tab.
             result.tabs.forEach((tab) => {
-                if (tab.url !== saverUrl) {
-                    const li = document.createElement("li");
-                    li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`;
-                    li.addEventListener("click", removeURL);
-                    urlList.append(li);
-                    chrome.tabs.remove(tab.id);
-                }
+                const li = document.createElement("li");
+                li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`;
+                li.addEventListener("click", removeUrl, tab.id);
+                urlList.append(li);
+
+                // Close open tab.
+                chrome.tabs.remove(tab.id);
             });
         });
     }
 
-    function removeURL(event) {
+    function removeUrl(event, tabId) {
         const url = event.target.href;
         
-        chrome.storage.sync.get(["tabs"], (result) => {
+        chrome.storage.sync.get(["tabs"], result => {
             const tabToRemove = result.tabs.filter((tab) => {
                 return url === tab.url;
             });
@@ -82,18 +77,4 @@ window.onload = function() {
             chrome.storage.sync.set({ tabs: newTabs }, buildUrlList);
         });
     }
-
-    function closeTabs() {
-        const saverUrl = "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html";
-
-        chrome.tabs.query({}, tabs => {
-            tabs.forEach((tab, index) => {
-                if (tab.url !== saverUrl) {
-                    chrome.tabs.remove(tab.id);
-                }
-            });
-        });
-    }
 }
-
-// chrome.storage.sync.get(["urls"], (result) => { alert(result.urls) });
