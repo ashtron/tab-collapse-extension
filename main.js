@@ -23,26 +23,26 @@ window.onload = function() {
     }
 
     function setURLs() {
-
-        // Get the URLs of all open tabs.
-        chrome.tabs.query({}, tabs => {
-            let _tabs = [];
-        
-            tabs.forEach(tab => {
-                _tabs.push({
-                    title: tab.title,
-                    url: tab.url,
-                    id: tab.id
+        chrome.storage.sync.get(["tabs"], (result) => {
+            // Get the URLs of all open tabs.
+            chrome.tabs.query({}, tabs => {
+                let _tabs = result.tabs;
+            
+                tabs.forEach(tab => {
+                    _tabs.push({
+                        title: tab.title,
+                        url: tab.url,
+                        id: tab.id
+                    });
                 });
-            });
 
-            // Remove duplicates.
-            _tabs = [...new Set(_tabs)];
-        
-            // Save to storage.
-            chrome.storage.sync.set({ tabs: _tabs }, buildUrlList);
-        });
-        
+                // Remove duplicates.
+                _tabs = [...new Set(_tabs)];
+            
+                // Save to storage.
+                chrome.storage.sync.set({ tabs: _tabs }, buildUrlList);
+            });
+        });        
     }
 
     function buildUrlList() {
