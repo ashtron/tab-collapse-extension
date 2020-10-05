@@ -26,7 +26,7 @@ window.onload = function() {
 
             // Concatenate saved tabs with open tabs.
             chrome.tabs.query({}, tabs => {
-                let _tabs = result.tabs;
+                let _tabs = result.tabs || [];
             
                 tabs.forEach(tab => {
                     if (tab.title !== "Tab Saver" && tab.url.slice(0, 4) === "http") {
