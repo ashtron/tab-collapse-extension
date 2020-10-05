@@ -6,16 +6,7 @@ window.onload = function() {
 
     const collapseBtn = document.getElementById("collapse-btn");
     const clearBtn = document.getElementById("clear-btn");
-    const openBtn = document.getElementById("open-btn");
-    const toggleBtn = document.getElementById("toggle-btn");
     
-    toggleBtn.addEventListener("click", () => {
-        chrome.storage.sync.get(["isOpen"], (result) => {
-            chrome.storage.sync.set({ isOpen: !result.isOpen});
-            console.log(!result.isOpen);
-        });
-    });
-
     collapseBtn.addEventListener("click", () => {        
         setURLs();
     });
@@ -25,12 +16,6 @@ window.onload = function() {
         const urlList = document.getElementById("urls");
         urlList.innerHTML = "";
     });
-
-    // openBtn.addEventListener("click", () => {
-    //     collapseBtn.classList.remove("hidden");
-    //     openBtn.classList.remove("hidden");
-    //     chrome.tabs.create({ url: "popup.html" });
-    // });
 
     function setOpenStatus() {
         chrome.storage.sync.set({ isOpen: true });
