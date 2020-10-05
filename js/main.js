@@ -54,8 +54,8 @@ window.onload = function() {
             // Add a new li for each saved tab.
             result.tabs.forEach((tab) => {
                 const li = document.createElement("li");
-                li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`;
-                li.addEventListener("click", removeUrl, tab.id);
+                li.innerHTML = `<img src="${getFaviconUrl(tab)}"><a href="${tab.url}" target="_blank">${tab.title}</a>`;
+                li.addEventListener("click", removeUrl);
                 urlList.append(li);
 
                 // Close open tab.
@@ -64,7 +64,7 @@ window.onload = function() {
         });
     }
 
-    function removeUrl(event, tabId) {
+    function removeUrl(event) {
         const url = event.target.href;
         
         chrome.storage.sync.get(["tabs"], result => {
@@ -78,5 +78,11 @@ window.onload = function() {
 
             chrome.storage.sync.set({ tabs: newTabs }, buildUrlList);
         });
+    }
+
+    function getFaviconUrl(tab) {
+        const re = /https:\/\/(.+?)\//;
+        // console.log(tab.url.match(re)[1]);
+        return `https://favicons.githubusercontent.com/${tab.url.match(re)[1]}`;
     }
 }

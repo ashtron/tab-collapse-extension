@@ -5,7 +5,7 @@
       "default_icon": "assets/images/icon.png"
     },
     "background": {
-      "scripts": ["background.js"]
+      "scripts": ["js/background.js"]
     },
     "permissions": [
       "tabs",

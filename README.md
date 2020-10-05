@@ -1,4 +1,6 @@
-# tab-collapse-extension
+# Tab Saver
 
-## To do
-- [] Don't open new page when Tab Saver is already open
+## To Do
+- Better handling when icon is clicked with Tab Saver already open
+- Make favicons look better
+- Removal buttons
