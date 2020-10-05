@@ -1,6 +1,11 @@
 window.onload = function() {
     const collapseBtn = document.getElementById("collapse-btn");
     collapseBtn.addEventListener("click", () => {
+        const saverUrl = "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html";
+        if (window.location.href !== saverUrl) {
+            chrome.tabs.create({ url: "saverUrl" });
+        }
+        
         setURLs();
     });
 
@@ -9,28 +14,26 @@ window.onload = function() {
         chrome.storage.sync.set({ tabs: [] });
         const urlList = document.getElementById("urls");
         urlList.innerHTML = "";
-        chrome.tabs.create({ url: "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html" });
     });
 
-    buildUrlList();
+    const closeTabsBtn = document.getElementById("close-tabs-btn");
+    closeTabsBtn.addEventListener("click", () => {
+        closeTabs();
+    });
 
-    // function updateURLs() {
-    //     chrome.storage.sync.get(["urls"], (res) => {
-    //         setURLs(res.urls);
-    //     });
+    // buildUrlList();
 
-    // }
+    function setURLs() {
 
-    function setURLs(currentURLs) {
-
-        // Get the URLs of the current window's tabs.
+        // Get the URLs of all open tabs.
         chrome.tabs.query({}, tabs => {
             let _tabs = [];
         
             tabs.forEach(tab => {
                 _tabs.push({
                     title: tab.title,
-                    url: tab.url
+                    url: tab.url,
+                    id: tab.id
                 });
             });
 
@@ -38,9 +41,7 @@ window.onload = function() {
             _tabs = [...new Set(_tabs)];
         
             // Save to storage.
-            chrome.storage.sync.set({ tabs: _tabs });
-
-            buildUrlList();
+            chrome.storage.sync.set({ tabs: _tabs }, buildUrlList);
         });
         
     }
@@ -50,13 +51,21 @@ window.onload = function() {
             const urlList = document.getElementById("urls");
             urlList.innerHTML = "";
 
+            const saverUrl = "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html";
             result.tabs.forEach((tab) => {
-                const li = document.createElement("li");
-                li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`;
-                li.addEventListener("click", removeURL);
-                urlList.append(li);
+                if (tab.url !== saverUrl) {
+                    const li = document.createElement("li");
+                    li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`;
+                    li.addEventListener("click", removeURL);
+                    urlList.append(li);
+                    chrome.tabs.remove(tab.id);
+                }
             });
+
+            // closeTabs();
         });
+
+        // closeTabs();
     }
 
     function removeURL(event) {
@@ -72,6 +81,18 @@ window.onload = function() {
             newTabs.splice(tabToRemoveIndex, 1);
 
             chrome.storage.sync.set({ tabs: newTabs }, buildUrlList);
+        });
+    }
+
+    function closeTabs() {
+        const saverUrl = "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html";
+
+        chrome.tabs.query({}, tabs => {
+            tabs.forEach((tab, index) => {
+                if (tab.url !== saverUrl) {
+                    chrome.tabs.remove(tab.id);
+                }
+            });
         });
     }
 }
