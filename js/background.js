@@ -15,5 +15,6 @@ chrome.browserAction.onClicked.addListener(() => {
 });
 
 function closePrevious(previousTabId) {
-    chrome.tabs.remove(previousTabId);
+    if (previousTabId >= 0)
+        chrome.tabs.remove(previousTabId);
 }

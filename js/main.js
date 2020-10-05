@@ -29,7 +29,7 @@ window.onload = function() {
                 let _tabs = result.tabs;
             
                 tabs.forEach(tab => {
-                    if (tab.title !== "Tab Saver") {
+                    if (tab.title !== "Tab Saver" && tab.url.slice(0, 4) === "http") {
                         _tabs.push({
                             title: tab.title,
                             url: tab.url,
