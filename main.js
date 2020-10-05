@@ -24,20 +24,24 @@ window.onload = function() {
 
     function setURLs() {
         chrome.storage.sync.get(["tabs"], (result) => {
+
             // Get the URLs of all open tabs.
             chrome.tabs.query({}, tabs => {
                 let _tabs = result.tabs;
             
                 tabs.forEach(tab => {
-                    _tabs.push({
-                        title: tab.title,
-                        url: tab.url,
-                        id: tab.id
-                    });
+                    if (tab.title !== "Tab Saver") {
+                        _tabs.push({
+                            title: tab.title,
+                            url: tab.url,
+                            id: tab.id
+                        });
+                    }
                 });
 
                 // Remove duplicates.
                 _tabs = [...new Set(_tabs)];
+                console.log(_tabs);
             
                 // Save to storage.
                 chrome.storage.sync.set({ tabs: _tabs }, buildUrlList);
