@@ -3,13 +3,13 @@ window.onload = function() {
 
     function init() {
         const saveButton = document.getElementById("save-btn");
-        const clearBtn = document.getElementById("clear-btn");
+        const clearButton = document.getElementById("clear-btn");
         
         saveButton.addEventListener("click", () => {        
             update();
         });
     
-        clearBtn.addEventListener("click", () => {
+        clearButton.addEventListener("click", () => {
             // Reset list of saved URLs.
             chrome.storage.sync.set({ tabs: [] });
     
@@ -17,6 +17,8 @@ window.onload = function() {
             const urlList = document.getElementById("urls");
             urlList.innerHTML = "";
         });
+
+        update();
     }
 
     function update() {
