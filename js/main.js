@@ -25,12 +25,18 @@ window.onload = function() {
         chrome.storage.sync.get(["tabs"], (result) => {
 
             // Concatenate saved tabs with open tabs.
-            chrome.tabs.query({}, tabs => {
-                let _tabs = result.tabs || [];
+            chrome.tabs.query({}, openTabs => {
+                let newTabs = result.tabs || [];                
             
-                tabs.forEach(tab => {
-                    if (tab.title !== "Tab Saver" && tab.url.slice(0, 4) === "http") {
-                        _tabs.push({
+                openTabs.forEach(tab => {
+                    const isTabSaver = tab.title === "Tab Saver";
+                    const isHTTP = tab.url.slice(0, 4) === "http";
+                    const isUnique = newTabs.findIndex(savedTab => {
+                        return tab.url === savedTab.url;
+                    }) === -1;
+    
+                    if (!isTabSaver && isHTTP && isUnique) {
+                        newTabs.push({
                             title: tab.title,
                             url: tab.url,
                             id: tab.id
@@ -39,9 +45,9 @@ window.onload = function() {
                 });
 
                 // Remove duplicates.
-                _tabs = [...new Set(_tabs)];
+                newTabs = [...new Set(newTabs)];
             
-                chrome.storage.sync.set({ tabs: _tabs }, buildUrlList);
+                chrome.storage.sync.set({ tabs: newTabs }, buildUrlList);
             });
         });        
     }
@@ -82,7 +88,6 @@ window.onload = function() {
 
     function getFaviconUrl(tab) {
         const re = /https:\/\/(.+?)\//;
-        // console.log(tab.url.match(re)[1]);
         return `https://favicons.githubusercontent.com/${tab.url.match(re)[1]}`;
     }
 }
