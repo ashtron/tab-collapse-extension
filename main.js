@@ -1,5 +1,4 @@
 window.onload = function() {
-
     const collapseBtn = document.getElementById("collapse-btn");
     collapseBtn.addEventListener("click", () => {
         setURLs();
@@ -10,6 +9,7 @@ window.onload = function() {
         chrome.storage.sync.set({ tabs: [] });
         const urlList = document.getElementById("urls");
         urlList.innerHTML = "";
+        chrome.tabs.create({ url: "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html" });
     });
 
     buildUrlList();
@@ -48,12 +48,30 @@ window.onload = function() {
     function buildUrlList() {
         chrome.storage.sync.get(["tabs"], (result) => {
             const urlList = document.getElementById("urls");
+            urlList.innerHTML = "";
 
             result.tabs.forEach((tab) => {
                 const li = document.createElement("li");
-                li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`
+                li.innerHTML = `<a href="${tab.url}" target="_blank">${tab.title}</a>`;
+                li.addEventListener("click", removeURL);
                 urlList.append(li);
             });
+        });
+    }
+
+    function removeURL(event) {
+        const url = event.target.href;
+        
+        chrome.storage.sync.get(["tabs"], (result) => {
+            const tabToRemove = result.tabs.filter((tab) => {
+                return url === tab.url;
+            });
+
+            const tabToRemoveIndex = result.tabs.indexOf(tabToRemove[0]);
+            let newTabs = result.tabs.slice();
+            newTabs.splice(tabToRemoveIndex, 1);
+
+            chrome.storage.sync.set({ tabs: newTabs }, buildUrlList);
         });
     }
 }
