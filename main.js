@@ -1,27 +1,41 @@
 window.onload = function() {
+    chrome.storage.sync.get(["isOpen"], (result) => {
+        if (!result.isOpen)
+            chrome.tabs.create({ url: "popup.html" }, setOpenStatus);
+    });
+
     const collapseBtn = document.getElementById("collapse-btn");
-    collapseBtn.addEventListener("click", () => {
-        const saverUrl = "chrome-extension://jgcminoplfldknphjiehhofjjlkenaod/popup.html";
-        if (window.location.href !== saverUrl) {
-            chrome.tabs.create({ url: "saverUrl" });
-        }
-        
+    const clearBtn = document.getElementById("clear-btn");
+    const openBtn = document.getElementById("open-btn");
+    const toggleBtn = document.getElementById("toggle-btn");
+    
+    toggleBtn.addEventListener("click", () => {
+        chrome.storage.sync.get(["isOpen"], (result) => {
+            chrome.storage.sync.set({ isOpen: !result.isOpen});
+            console.log(!result.isOpen);
+        });
+    });
+
+    collapseBtn.addEventListener("click", () => {        
         setURLs();
     });
 
-    const clearBtn = document.getElementById("clear-btn");
     clearBtn.addEventListener("click", () => {
         chrome.storage.sync.set({ tabs: [] });
         const urlList = document.getElementById("urls");
         urlList.innerHTML = "";
     });
 
-    const closeTabsBtn = document.getElementById("close-tabs-btn");
-    closeTabsBtn.addEventListener("click", () => {
-        closeTabs();
-    });
+    // openBtn.addEventListener("click", () => {
+    //     collapseBtn.classList.remove("hidden");
+    //     openBtn.classList.remove("hidden");
+    //     chrome.tabs.create({ url: "popup.html" });
+    // });
 
-    // buildUrlList();
+    function setOpenStatus() {
+        chrome.storage.sync.set({ isOpen: true });
+        setURLs();
+    }
 
     function setURLs() {
 
@@ -61,11 +75,7 @@ window.onload = function() {
                     chrome.tabs.remove(tab.id);
                 }
             });
-
-            // closeTabs();
         });
-
-        // closeTabs();
     }
 
     function removeURL(event) {
