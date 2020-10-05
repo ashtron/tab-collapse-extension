@@ -47,7 +47,7 @@ window.onload = function() {
     }
 
     function buildUrlList() {
-        chrome.storage.sync.get(["tabs"], (result) => {
+        chrome.storage.sync.get(["tabs"], result => {
             const urlList = document.getElementById("urls");
             urlList.innerHTML = "";
 
